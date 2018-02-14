@@ -35,6 +35,9 @@ class Book(models.Model):
         return ', '.join([genre.name for genre in self.genre.all()[:3] ])
     display_genre.short_description = 'Genre'
 
+    def count_available(self):
+        return self.bookinstance_set.filter(status='a').count()
+
 class BookInstance(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text="Unique ID for this book")
     book = models.ForeignKey(Book, on_delete=models.SET_NULL, null=True)
