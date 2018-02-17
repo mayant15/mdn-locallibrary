@@ -18,24 +18,20 @@
   </p>
 
   <ul>
+      <strong>Authors:</strong> {{ num_authors }}
+    </li>
     <li>
       <strong>Books:</strong> {{ num_books }}
     </li>
     <li>
-      <strong>Copies:</strong> {{ num_instances }}
-    </li>
-    <li>
-      <strong>Copies Available:</strong> {{ num_instances_available }}
-    </li>
-    <li>
-      <strong>Authors:</strong> {{ num_authors }}
-    </li>
-    <li>
-      <strong>Scienc Fiction:</strong> {{ num_sf }}
-    </li>
-    <li>
-      <strong>Books By Agatha Christie:</strong> {{ num_ac }}
+      <strong>Available:</strong> {{ num_books_available }}
     </li>
   </ul>
+
+  <footer>
+    <p>
+      You have visited this site {{ num_visits }} {% if num_visits == 1 %}time {% else %}times{% endif %}.
+    </p>
+  </footer>
 
 {% endblock %}
