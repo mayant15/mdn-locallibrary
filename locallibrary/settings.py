@@ -121,3 +121,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 #SESSION_SAVE_EVERY_REQUEST = True
+
+LOGIN_REDIRECT_URL = '/'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
