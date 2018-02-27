@@ -1,1 +1,4 @@
 db.sqlite3
+catalog/__pycache__/*
+catalog/migrations/*
+locallibrary/__pycache__/*
