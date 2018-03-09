@@ -1,8 +1,13 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect
+from django.urls import reverse, reverse_lazy
 from django.views import generic
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Book, Author, BookInstance
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.decorators import permission_required
+from .models import RenewBookForm
+import datetime
 
 
 def index(request):
@@ -72,3 +77,51 @@ class AllLoanedBooksListView(PermissionRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         return BookInstance.objects.filter(status__exact='o').order_by('due_back')
+
+
+@permission_required('catalog.can_mark_returned')
+def renew_book_librarian(request, pk):
+    book_inst = get_object_or_404(BookInstance, pk=pk)
+
+    # POST => process the form data
+    if request.method == 'POST':
+        # Validate data, populate with old values
+        form = RenewBookForm(request.POST)
+
+        # Check if valid
+        if form.is_valid():
+            # Now process
+            book_inst.due_back = form.cleaned_data['renewal_date']
+            book_inst.save()
+
+            # Redirect to URL
+            return HttpResponseRedirect(reverse('all-borrowed'))
+
+    # If GET, give default first form
+    else:
+        proposed_renewal_date = datetime.date.today() + datetime.timedelta(weeks=3)
+        form = RenewBookForm(initial={'renewal_date': proposed_renewal_date})
+
+    return render(request, 'catalog/book_renew_librarian.html', {'form': form, 'bookinst': book_inst})
+
+
+# Author edit views generic
+class AuthorCreate(CreateView):
+    model = Author
+    # fields can be specified like this
+    fields = '__all__'
+    # set initial values
+    initial = {'date_of_death': '05/01/2018', }
+
+
+class AuthorUpdate(UpdateView):
+    model = Author
+    # also like this
+    fields = ['first_name', 'last_name', 'date_of_birth', 'date_of_death']
+
+
+class AuthorDelete(DeleteView):
+    model = Author
+    # by default this redirects to the author detail page
+    # we want it to go to the author detail page
+    success_url = reverse_lazy('authors')

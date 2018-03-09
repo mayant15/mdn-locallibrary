@@ -2,7 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import date
 from django.urls import reverse
+from django import forms
+from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext_lazy as _
 import uuid
+import datetime
 
 
 # Create your models here.
@@ -86,3 +90,20 @@ class Author(models.Model):
 
     def __str__(self):
         return '{0}, {1}'.format(self.last_name, self.first_name)
+
+
+class RenewBookForm(forms.Form):
+    renewal_date = forms.DateField(help_text="Enter a date between now and 4 weeks (default 3)")
+
+    def clean_renewal_date(self):
+        data = self.cleaned_data['renewal_date']
+
+        # Check if date is not in the past
+        if data < datetime.date.today():
+            raise ValidationError(_('Invalid date - renewal in past'))
+
+        # Check if date is in correct range (<4weeks)
+        if data > datetime.date.today() + datetime.timedelta(weeks=4):
+            raise ValidationError(_('Invalid date - renewal more than 4 weeks ahead'))
+
+        return data
