@@ -1,4 +1,7 @@
 db.sqlite3
+*.pyc
 catalog/__pycache__/*
 catalog/migrations/*
+catalog/tests/__pycache__/*
 locallibrary/__pycache__/*
+todo.txt
